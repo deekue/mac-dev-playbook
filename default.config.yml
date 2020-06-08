@@ -9,6 +9,7 @@ configure_osx: yes
 dotfiles_repo: https://github.com/deekue/dotfiles.git
 dotfiles_repo_accept_hostkey: yes
 dotfiles_prefix: "."
+dotfiles_backup_existing: yes
 dotfiles_repo_local_destination: ~/src/dotfiles
 dotfiles_files:
   - bashrc
@@ -17,8 +18,6 @@ dotfiles_files:
   - osx
   - vimrc
   - vim
-  - fonts
-  - bashrc
   - bash_aliases
   - bash_logout
   - gitconfig
