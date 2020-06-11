@@ -1,0 +1,77 @@
+---
+# Custom Terminal.
+#
+# unneeded after this PR is live https://github.com/alacritty/alacritty/pull/3441
+
+- debug:
+    msg: "foobar"
+
+- block:
+  - name: Ensure man directory exists
+    file:
+      path: "/usr/local/share/man/man1"
+      state: directory
+      recurse: true
+    become: true
+
+  - name: Check for existing man page
+    stat:
+      path: "/usr/local/share/man/man1/alacritty.1.gz"
+      get_checksum: no
+      get_mime: no
+    register: alacritty_man
+
+  - name: Download man page from release page
+    get_url:
+      # TODO fetch version that matches install alacritty
+      url: "https://github.com/alacritty/alacritty/releases/download/v0.4.3/alacritty.1.gz"
+      dest: "/usr/local/share/man/man1/alacritty.1.gz"
+      mode: 0644
+    when: not alacritty_man.stat.exists
+    become: true
+  become: false
+
+- block:
+  - name: Check for bash completion dir
+    file:
+      path: "~/.bash_completion"
+      follow: yes # in case of symlinks to dotfiles
+      state: directory
+
+  - name: Check for existing completion file
+    stat:
+      path: "~/.bash_completion/alacritty"
+      get_checksum: no
+      get_mime: no
+    register: alacritty_bashcomp
+
+  - name: Download Bash completion
+    get_url:
+      url: "https://github.com/alacritty/alacritty/releases/download/v0.4.3/alacritty.bash"
+      dest: "~/.bash_completion/alacritty"
+    when: not alacritty_bashcomp.stat.exists
+  become: false
+
+- block:
+  - name: Check for existing Terminfo
+    stat:
+      path: "/usr/share/terminfo/61/alacritty"
+      get_checksum: no
+      get_mime: no
+    register: alacritty_terminfo
+
+  - name: Download Terminfo file
+    get_url:
+      url: "https://github.com/alacritty/alacritty/releases/download/v0.4.3/alacritty.info"
+      dest: "~/Downloads/alacritty.info"
+      backup: yes
+    when: not alacritty_terminfo.stat.exists
+    register: alacritty_terminfo_dl
+
+  - name: Compile Terminfo file
+    # TODO use alacritty_terminfo.blah for file path
+    command: "tic -xe alacritty,alacritty-direct {{ alacritty_terminfo_dl.dest }}"
+    when: not alacritty_terminfo.stat.exists
+    become: true
+
+  become: false
