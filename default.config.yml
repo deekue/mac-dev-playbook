@@ -2,59 +2,43 @@
 downloads: ~/Downloads/ansible/
 
 configure_dotfiles: yes
-configure_sudoers: yes
-configure_terminal: yes
+configure_sudoers: no
+configure_terminal: no
 configure_osx: yes
 
 dotfiles_repo: https://github.com/deekue/dotfiles.git
 dotfiles_repo_accept_hostkey: yes
-dotfiles_prefix: "."
 dotfiles_repo_local_destination: ~/src/dotfiles
+dotfiles_prefix: "."
+dotfiles_backup_existing: true
 dotfiles_files:
+  - config
   - bashrc
-#  - gitignore
+  - bash_aliases
+  - bash_logout
+  - bash_completion
+  - profile
 #  - inputrc
   - osx
   - vimrc
   - vim
-  - fonts
-  - bashrc
-  - bash_aliases
-  - bash_logout
   - gitconfig
-  - profile
+#  - gitignore
   - screenrc
-  - lynxrc
-  - nethackrc
   - tmux.conf
+  - nethackrc
+  - lynxrc
 
+homebrew_brewfile_dir: '~/src/dotfiles'
 homebrew_installed_packages:
   # - ansible # Installed via Pip.
-#  - autoconf
+  - bash
   - bash-completion
-#  - doxygen
-#  - gettext
-#  - gifsicle
   - git
   - github/gh/gh
-#  - go
-#  - gpg
-#  - httpie
-#  - iperf
-#  - libevent
-#  - sqlite
-#  - mcrypt
-#  - nmap
-#  - node
-#  - nvm
-#  - php
-#  - ssh-copy-id
-#  - cowsay
-#  - readline
-#  - openssl
-#  - pv
   - wget
-#  - wrk
+  - koekeishiya/formulae/yabai
+  - koekeishiya/formulae/skhd
 
 homebrew_taps:
   - homebrew/core
@@ -62,6 +46,7 @@ homebrew_taps:
 
 homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
+  - alacritty
 #  - chromedriver
 #  - docker
 #  - dropbox
@@ -76,12 +61,14 @@ homebrew_cask_apps:
 #  - vagrant
 
 # See `geerlingguy.mas` role documentation for usage instructions.
-mas_email: ""
-mas_password: ""
+mas_email: "daniel@chaosengine.net"
+mas_signin_dialog: yes
+#mas_password: ""
 mas_installed_apps:
   - { id: 926036361, name: "LastPass Password Manager" }
 
-osx_script: "~/.osx --no-restart"
+osx_script: "~/.osx"
+osx_script_params: "--no-restart"
 
 # Install packages from other package managers.
 # Note: You are responsible for making sure the required package managers are
@@ -104,5 +91,7 @@ pip_packages: []
   #   version: "0.16.3" # default: N/A
 
 # Glob pattern to ansible task files to run after all other tasks are finished.
-post_provision_tasks: []
+post_provision_tasks: # []
+  - "tasks/alacritty.yml"
+  
 
