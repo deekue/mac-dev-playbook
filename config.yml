@@ -12,18 +12,21 @@ dotfiles_repo_local_destination: ~/src/dotfiles
 dotfiles_prefix: "."
 dotfiles_backup_existing: true
 dotfiles_files:
-  - config
+  - config/alacritty
+  - config/skhd
+  - config/yabai
   - bashrc
   - bash_aliases
   - bash_logout
   - bash_completion
+  - bash_completion.d
   - profile
 #  - inputrc
   - osx
   - vimrc
   - vim
   - gitconfig
-#  - gitignore
+  - gitignore_global
   - screenrc
   - tmux.conf
   - nethackrc
@@ -31,15 +34,15 @@ dotfiles_files:
 
 homebrew_brewfile_dir: '~/src/dotfiles'
 homebrew_installed_packages:
-  # - ansible # Installed via Pip.
   - bash
   - bash-completion
   - git
   - github/gh/gh
-  - wget
   - koekeishiya/formulae/yabai
   - koekeishiya/formulae/skhd
   - m-cli
+  - npm
+  - wget
 
 homebrew_taps:
   - homebrew/core
@@ -51,8 +54,10 @@ homebrew_cask_apps:
   - firefox
   - google-chrome
   - google-photos-backup-and-sync
+  - kitty
   - slack
   - ubersicht
+  - zoom
 #  - docker
 
 # See `geerlingguy.mas` role documentation for usage instructions.
@@ -76,7 +81,8 @@ gem_packages: []
   # - name: bundler
   #   state: present # present/absent/latest, default: present
   #   version: "~> 1.15.1" # default: N/A
-npm_packages: []
+npm_packages: 
+  - name: '@google/clasp'
   # - name: webpack
   #   state: present # present/absent/latest, default: present
   #   version: "^2.6" # default: N/A
