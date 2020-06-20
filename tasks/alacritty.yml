@@ -1,77 +1,109 @@
 ---
-# Custom Terminal.
+# Post-install for Alacritty
 #
-# unneeded after this PR is live https://github.com/alacritty/alacritty/pull/3441
+# tasks for downloading extras will be unneeded after this PR is live
+# https://github.com/alacritty/alacritty/pull/3441
+#
+# TODO install completions for fish, zsh
+# TODO run if version number is newer
+# TODO make this a role, depend on geerlingguy.homebrew for install of # alacritty
 
-- debug:
-    msg: "foobar"
+- name: Check for packaged extras
+  stat:
+    path: "/Applications/Alacritty.app/Contents/Resourcs/completions"
+  register: alacritty_packaged_extras
 
+- name: Get current Alacritty version
+  command: /Applications/Alacritty.app/Contents/MacOS/alacritty -V
+  register: alacritty_version_cmd
+  changed_when: false
+
+- name: Set Alacritty version number fact
+  set_fact:
+    # alacritty_version_cmd.stdout = "alacritty 0.4.3 (c723247)"
+    alacritty_version: "{{ alacritty_version_cmd.stdout|regex_replace('^alacritty ([\\d.]+) .*$', '\\1') }}"
+
+- name: Set Alacritty release URL fact
+  set_fact:
+    alacritty_release_url: "https://github.com/alacritty/alacritty/releases/download/v{{ alacritty_version }}/"
+  when: not alacritty_packaged_extras.stat.exists
+  
 - block:
-  - name: Ensure man directory exists
-    file:
-      path: "/usr/local/share/man/man1"
-      state: directory
-      recurse: true
-    become: true
-
-  - name: Check for existing man page
-    stat:
-      path: "/usr/local/share/man/man1/alacritty.1.gz"
-      get_checksum: no
-      get_mime: no
-    register: alacritty_man
-
   - name: Download man page from release page
     get_url:
-      # TODO fetch version that matches install alacritty
-      url: "https://github.com/alacritty/alacritty/releases/download/v0.4.3/alacritty.1.gz"
+      url: "{{ alacritty_release_url }}/alacritty.1.gz"
       dest: "/usr/local/share/man/man1/alacritty.1.gz"
       mode: 0644
-    when: not alacritty_man.stat.exists
-    become: true
-  become: false
+      group: admin
+    when:
+      - not alacritty_packaged_extras.stat.exists
+
+  - name: Install man page
+    shell:
+      command: "gzip -c {{ alacritty_packaged_extras.stat.path|dirname }}/alacritty.man > /usr/local/share/man/man1/alacritty.1.gz"
+    when:
+      - alacritty_packaged_extras.stat.exists
+  become: true
 
 - block:
-  - name: Check for bash completion dir
-    file:
-      path: "~/.bash_completion"
-      follow: yes # in case of symlinks to dotfiles
-      state: directory
-
-  - name: Check for existing completion file
+  - name: Check for existing bash completion dir
     stat:
-      path: "~/.bash_completion/alacritty"
+      path: "/usr/local/etc/bash_completion.d"
       get_checksum: no
       get_mime: no
     register: alacritty_bashcomp
 
   - name: Download Bash completion
     get_url:
-      url: "https://github.com/alacritty/alacritty/releases/download/v0.4.3/alacritty.bash"
-      dest: "~/.bash_completion/alacritty"
-    when: not alacritty_bashcomp.stat.exists
+      url: "{{ alacritty_release_url }}/alacritty.bash"
+      dest: "{{ alacritty_bashcomp.stat.path }}/alacritty"
+    when:
+      - alacritty_bashcomp.stat.exists
+      - not alacritty_packaged_extras.stat.exists
+    become: true
+
+  - name: Install Bash completion
+    copy:
+      src: "{{ alacritty_packaged_extras.stat.path }}/alacritty.bash"
+      dest: "{{ alacritty_bashcomp.stat.path }}/alacritty"
+      remote_src: true
+    when:
+      - alacritty_bashcomp.stat.exists
+      - alacritty_packaged_extras.stat.exists
+    become: true
   become: false
 
 - block:
-  - name: Check for existing Terminfo
-    stat:
-      path: "/usr/share/terminfo/61/alacritty"
-      get_checksum: no
-      get_mime: no
-    register: alacritty_terminfo
-
   - name: Download Terminfo file
     get_url:
-      url: "https://github.com/alacritty/alacritty/releases/download/v0.4.3/alacritty.info"
+      url: "{{ alacritty_release_url }}/alacritty.info"
       dest: "~/Downloads/alacritty.info"
       backup: yes
-    when: not alacritty_terminfo.stat.exists
+    when: 
+      - not alacritty_packaged_extras.stat.exists
     register: alacritty_terminfo_dl
 
-  - name: Compile Terminfo file
-    # TODO use alacritty_terminfo.blah for file path
-    command: "tic -xe alacritty,alacritty-direct {{ alacritty_terminfo_dl.dest }}"
-    when: not alacritty_terminfo.stat.exists
-    become: true
+  - name: Compile downloaded Terminfo file
+    command: "tic -sxe alacritty,alacritty-direct {{ alacritty_terminfo_dl.dest }}"
+    when:
+      - alacritty_terminfo_dl.changed
+      - not alacritty_packaged_extras.stat.exists
 
+  - name: Compile packaged Terminfo file
+    command: "tic -sxe alacritty,alacritty-direct {{ alacritty_packaged_extras.stat.path|dirname }}/alacritty.info"
+    when:
+      - alacritty_packaged_extras.stat.exists
+
+  - name: Install compiled Terminfo system-wide
+    copy:
+      src: "~/.terminfo/61/{{ item }}"
+      dest: "/usr/share/terminfo/61/{{ item }}"
+      owner: "root"
+      group: "wheel"
+      mode: 0644
+    loop:
+      - "alacritty"
+      - "alacritty-direct"
+    when: false # TODO make this a config option in the role
+    become: true
   become: false
