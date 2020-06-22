@@ -27,7 +27,7 @@ dotfiles_files:
   - vim
   - gitconfig
   - gitignore_global
-  - screenrc
+#  - screenrc
   - tmux.conf
   - nethackrc
   - lynxrc
@@ -51,21 +51,20 @@ homebrew_taps:
 homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
   - alacritty
-  - firefox
-  - google-chrome
-  - google-photos-backup-and-sync
-  - kitty
-  - slack
-  - ubersicht
-  - zoom
+#  - firefox
+#  - google-chrome
+#  - google-photos-backup-and-sync
+#  - kitty
+#  - slack
+#  - ubersicht
+#  - zoom
 #  - docker
 
 # See `geerlingguy.mas` role documentation for usage instructions.
-mas_email: "daniel@chaosengine.net"
+mas_email: ""
 mas_signin_dialog: yes
 #mas_password: ""
-mas_installed_apps:
-  - { id: 926036361, name: "LastPass Password Manager" }
+mas_installed_apps: []
 
 osx_script: "~/.osx"
 osx_script_params: "--no-restart"
@@ -82,7 +81,7 @@ gem_packages: []
   #   state: present # present/absent/latest, default: present
   #   version: "~> 1.15.1" # default: N/A
 npm_packages: 
-  - name: '@google/clasp'
+  # - name: '@google/clasp'
   # - name: webpack
   #   state: present # present/absent/latest, default: present
   #   version: "^2.6" # default: N/A
