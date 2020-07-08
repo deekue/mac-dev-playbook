@@ -13,6 +13,7 @@ dotfiles_prefix: "."
 dotfiles_backup_existing: true
 dotfiles_files:
   - config/alacritty
+  - config/gh/config.yml
   - config/skhd
   - config/yabai
   - bashrc
@@ -23,11 +24,13 @@ dotfiles_files:
   - profile
 #  - inputrc
   - osx
-  - vimrc
-  - vim
+    # testing SpaceVim
+    #- vimrc
+    #- vim
   - gitconfig
   - gitignore_global
   - screenrc
+  - SpaceVim.d
   - tmux.conf
   - nethackrc
   - lynxrc
@@ -35,13 +38,19 @@ dotfiles_files:
 homebrew_brewfile_dir: '~/src/dotfiles'
 homebrew_installed_packages:
   - bash
-  - bash-completion
+  - bash-completion@2
+  - coreutils
+  - duti
   - git
   - github/gh/gh
+  - gnu-tar
+  - jq
   - koekeishiya/formulae/yabai
   - koekeishiya/formulae/skhd
-  - m-cli
+  - markdown
   - npm
+  - pipenv
+  - python
   - wget
 
 homebrew_taps:
@@ -56,7 +65,7 @@ homebrew_cask_apps:
   - google-photos-backup-and-sync
   - kitty
   - slack
-  - ubersicht
+  - signal
   - zoom
 #  - docker
 
@@ -64,8 +73,7 @@ homebrew_cask_apps:
 mas_email: "daniel@chaosengine.net"
 mas_signin_dialog: yes
 #mas_password: ""
-mas_installed_apps:
-  - { id: 926036361, name: "LastPass Password Manager" }
+mas_installed_apps: []
 
 osx_script: "~/.osx"
 osx_script_params: "--no-restart"
@@ -86,7 +94,11 @@ npm_packages:
   # - name: webpack
   #   state: present # present/absent/latest, default: present
   #   version: "^2.6" # default: N/A
-pip_packages: []
+pip_packages: # []
+  - name: 'black'
+  - name: 'flake8'
+  - name: 'virtualenv'
+  - name: 'yapf'
   # - name: mkdocs
   #   state: present # present/absent/latest, default: present
   #   version: "0.16.3" # default: N/A
@@ -95,4 +107,3 @@ pip_packages: []
 post_provision_tasks: # []
   - "tasks/alacritty.yml"
   
-
